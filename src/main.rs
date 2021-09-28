@@ -8,6 +8,8 @@ use std::time;
 use std::path;
 use std::process;
 use std::path::Path;
+use std::io::BufReader;
+use std::fs::File;
 
 use crate::code_runner::cmd;
 use crate::code_runner::language;
@@ -37,7 +39,17 @@ fn handle_error(error: Error) {
 
 
 fn start() -> Result<(), Error> {
-    let stdin = io::stdin();
+    // can't start debug with stdin / temp disable
+    // let stdin = io::stdin();
+    
+    // let stdin = fs::read_to_string("../sandbox.json").unwrap();
+    // let run_request = parse_request_from_string(stdin)?;
+
+    let path = "sandbox.json";
+    
+    let file = File::open(path).unwrap();
+    let stdin = BufReader::new(file);
+   
     let stdout = io::stdout();
     let args = env::args().collect();
 
@@ -144,16 +156,16 @@ struct RequestFile {
 
 
 #[derive(Debug)]
-struct File {
+struct GlotFile {
     path: path::PathBuf,
     content: String,
 }
 
-fn file_from_request_file(base_path: &path::Path, file: RequestFile) -> Result<File, Error> {
+fn file_from_request_file(base_path: &path::Path, file: RequestFile) -> Result<GlotFile, Error> {
     err_if_false(!file.name.is_empty(), Error::EmptyFileName())?;
     err_if_false(!file.content.is_empty(), Error::EmptyFileContent())?;
 
-    Ok(File{
+    Ok(GlotFile{
         path: base_path.join(file.name),
         content: file.content,
     })
@@ -201,7 +213,7 @@ fn unpack_bootstrap_file(work_path: &path::Path, bootstrap_file: &path::Path) ->
     Ok(())
 }
 
-fn write_file(file: &File) -> Result<(), Error> {
+fn write_file(file: &GlotFile) -> Result<(), Error> {
     let parent_dir = file.path.parent()
         .ok_or_else(|| Error::GetParentDir(file.path.to_path_buf()))?;
 
@@ -223,7 +235,7 @@ fn compile(work_path: &path::Path, command: &str) -> Result<cmd::SuccessOutput, 
 }
 
 
-fn run_default(work_path: &path::Path, language: language::Language, files: Vec<File>, stdin: Option<String>) -> Result<RunResult, Error> {
+fn run_default(work_path: &path::Path, language: language::Language, files: Vec<GlotFile>, stdin: Option<String>) -> Result<RunResult, Error> {
     let file_paths = get_relative_file_paths(work_path, files)?;
     let run_instructions = language::run_instructions(&language, file_paths);
 
@@ -253,7 +265,7 @@ fn run(work_path: &path::Path, command: &str, stdin: Option<String>) -> RunResul
     }
 }
 
-fn get_relative_file_paths(work_path: &path::Path, files: Vec<File>) -> Result<non_empty_vec::NonEmptyVec<path::PathBuf>, Error> {
+fn get_relative_file_paths(work_path: &path::Path, files: Vec<GlotFile>) -> Result<non_empty_vec::NonEmptyVec<path::PathBuf>, Error> {
     let names = files.into_iter()
         .map(|file| {
             let path = file.path
