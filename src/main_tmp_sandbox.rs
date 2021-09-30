@@ -37,6 +37,7 @@ fn handle_error(error: Error) {
     }
 }
 
+// this is sanbox mode fs structure now (modules/files tree file support)
 fn start() -> Result<(), Error> {
     // can't start debug with stdin / temp disable
     // let stdin = io::stdin();
@@ -49,6 +50,7 @@ fn start() -> Result<(), Error> {
     let args = env::args().collect();
 
     let run_request = parse_request(stdin)?;
+    // let run_request = sandbox_parse_request(stdin)?;
 
     let work_path = match work_path_from_args(args) {
         Some(path) => {
@@ -76,6 +78,16 @@ fn start() -> Result<(), Error> {
         write_file(file)?;
     }
 
+    // let sanbox_files = run_request.modules
+    //     .into_iter()
+    //     .map(|file| sandbox_file_from_request_file(&work_path, file))
+    //     .collect::<Result<_, _>>()?;
+
+    // for file in &sanbox_files {
+    //     write_file(file)?;
+    // }
+    
+
     let run_result = match run_request.command {
         Some(command) if !command.is_empty() => {
             run(&work_path, &command, run_request.stdin)
@@ -83,6 +95,7 @@ fn start() -> Result<(), Error> {
 
         Some(_) | None => {
             run_default(&work_path, run_request.language, files, run_request.stdin)?
+            // sandbox_run_default(&work_path, run_request.language, sanbox_files, run_request.stdin)?
         }
     };
 
@@ -134,6 +147,29 @@ fn to_error_result(error: cmd::Error) -> RunResult {
     }
 }
 
+// #[derive(serde::Deserialize, Debug)]
+// struct SandboxRunRequest {
+//     language: language::Language,
+//     modules: Vec<SandboxRequestFile>,
+//     directories: Option<Vec<SandboxRequestDirectory>>,
+//     stdin: Option<String>,
+//     command: Option<String>,
+// }
+
+// #[derive(serde::Deserialize, Debug)]
+// struct SandboxRequestDirectory {
+//     name: String,
+//     directory: Option<String>,
+// }
+
+// #[derive(serde::Deserialize, Debug)]
+// struct SandboxRequestFile {
+//     name: String,
+//     directory: Option<String>,
+//     code: String,
+// }
+
+
 #[derive(serde::Deserialize, Debug)]
 struct RunRequest {
     language: language::Language,
@@ -155,6 +191,19 @@ struct GlotFile {
     content: String,
 }
 
+// #[derive(Debug)]
+// struct SandboxDir {
+//     path: path::PathBuf,
+//     directory: Option<Box<SandboxDir>>,
+// }
+
+// #[derive(Debug)]
+// struct SandboxFile {
+//     path: path::PathBuf,
+//     content: String,
+//     // directory: Box<SandboxDir>
+// }
+
 fn file_from_request_file(base_path: &path::Path, file: RequestFile) -> Result<GlotFile, Error> {
     err_if_false(!file.name.is_empty(), Error::EmptyFileName())?;
     err_if_false(!file.content.is_empty(), Error::EmptyFileContent())?;
@@ -164,6 +213,24 @@ fn file_from_request_file(base_path: &path::Path, file: RequestFile) -> Result<G
         content: file.content,
     })
 }
+
+// fn sandbox_file_from_request_file(base_path: &path::Path, file: SandboxRequestFile) -> Result<SandboxFile, Error> {
+//     err_if_false(!file.name.is_empty(), Error::EmptyFileName())?;
+//     err_if_false(!file.code.is_empty(), Error::EmptyFileContent())?;
+
+//     // let dir = SandboxDir{};
+
+//     Ok(SandboxFile{
+//         path: base_path.join(file.name),
+//         content: file.code,
+//         // directory: dir
+//     })
+// }
+
+// fn sandbox_parse_request<R: io::Read>(reader: R) -> Result<SandboxRunRequest, Error> {
+//     serde_json::from_reader(reader)
+//         .map_err(Error::ParseRequest)
+// }
 
 fn parse_request<R: io::Read>(reader: R) -> Result<RunRequest, Error> {
     serde_json::from_reader(reader)
@@ -208,6 +275,7 @@ fn unpack_bootstrap_file(work_path: &path::Path, bootstrap_file: &path::Path) ->
 }
 
 fn write_file(file: &GlotFile) -> Result<(), Error> {
+// fn write_file(file: &SandboxFile) -> Result<(), Error> {
     let parent_dir = file.path.parent()
         .ok_or_else(|| Error::GetParentDir(file.path.to_path_buf()))?;
 
@@ -227,6 +295,20 @@ fn compile(work_path: &path::Path, command: &str) -> Result<cmd::SuccessOutput, 
     })
     .map_err(Error::Compile)
 }
+
+// // fn sandbox_run_default(work_path: &path::Path, language: language::Language, directories: Vec<SandboxDir>, files: Vec<SandboxFile>, stdin: Option<String>) -> Result<RunResult, Error> {
+// fn sandbox_run_default(work_path: &path::Path, language: language::Language,files: Vec<SandboxFile>, stdin: Option<String>) -> Result<RunResult, Error> {    
+//     let file_paths = sandbox_get_relative_file_paths(work_path, files)?;
+//     let run_instructions = language::run_instructions(&language, file_paths);
+
+//     for command in &run_instructions.build_commands {
+//         compile(work_path, command)?;
+//     }
+
+//     let run_result = run(work_path, &run_instructions.run_command, stdin);
+//     Ok(run_result)
+// }
+
 
 fn run_default(work_path: &path::Path, language: language::Language, files: Vec<GlotFile>, stdin: Option<String>) -> Result<RunResult, Error> {
     let file_paths = get_relative_file_paths(work_path, files)?;
@@ -257,6 +339,23 @@ fn run(work_path: &path::Path, command: &str, stdin: Option<String>) -> RunResul
         }
     }
 }
+
+// // fn sandbox_get_relative_file_paths(work_path: &path::Path, directories: Vec<SandboxDir>, files: Vec<SandboxFile>) -> Result<non_empty_vec::NonEmptyVec<path::PathBuf>, Error> {
+// fn sandbox_get_relative_file_paths(work_path: &path::Path, files: Vec<SandboxFile>) -> Result<non_empty_vec::NonEmptyVec<path::PathBuf>, Error> {
+//     let names = files.into_iter()
+//         .map(|file| {
+//             let path = file.path
+//                 .strip_prefix(work_path)
+//                 .map_err(Error::StripWorkPath)?;
+
+//             Ok(path.to_path_buf())
+//         })
+//         .collect::<Result<Vec<path::PathBuf>, Error>>()?;
+
+//     non_empty_vec::from_vec(names)
+//         .ok_or(Error::NoFiles())
+// }
+
 
 fn get_relative_file_paths(work_path: &path::Path, files: Vec<GlotFile>) -> Result<non_empty_vec::NonEmptyVec<path::PathBuf>, Error> {
     let names = files.into_iter()

@@ -21,12 +21,12 @@
                 //     "kind": "bin"
                 // }
             },
-            "args": [
-                "<",
-                "sandbox.json",
-                // "user_arg1",
-                // "user_arg2"
-            ],
+            // "args": [
+            //     "<",
+            //     "sandbox.json",
+            //     // "user_arg1",
+            //     // "user_arg2"
+            // ],
             "cwd": "${workspaceFolder}"
         }
     ]

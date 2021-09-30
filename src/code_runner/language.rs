@@ -42,6 +42,8 @@ pub enum Language {
     Scala,
     Swift,
     TypeScript,
+    // Build section
+    BuildCreateReactApp
 }
 
 
@@ -372,6 +374,21 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
                 run_command: "node a.js".to_string()
             }
         }
+
+        Language::BuildCreateReactApp => {
+            RunInstructions{
+                // TODO need return if errors
+                build_commands: vec![
+                    "npm install".to_string(),
+                    "npm install --save create-react-app".to_string(),
+                    // "npm install --save create-react-app typescript @types/node @types/react @types/react-dom @types/jest".to_string(),
+                    "npm run build".to_string(),
+                ],
+                // TODO create builded JSON from file system
+                run_command: "pwd".to_string()
+            }
+        }
+
     }
 }
 
