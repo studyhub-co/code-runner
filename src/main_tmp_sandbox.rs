@@ -40,11 +40,11 @@ fn handle_error(error: Error) {
 // this is sanbox mode fs structure now (modules/files tree file support)
 fn start() -> Result<(), Error> {
     // can't start debug with stdin / temp disable
-    // let stdin = io::stdin();
-    let path = "sandbox.json";
+    let stdin = io::stdin();
     
-    let file = File::open(path).unwrap();
-    let stdin = BufReader::new(file);
+    // let path = "sandbox.json";
+    // let file = File::open(path).unwrap();
+    // let stdin = BufReader::new(file);
    
     let stdout = io::stdout();
     let args = env::args().collect();
