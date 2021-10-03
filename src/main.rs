@@ -8,8 +8,8 @@ use std::time;
 use std::path;
 use std::process;
 use std::path::Path;
-use std::io::BufReader;
-use std::fs::File;
+// use std::io::BufReader;
+// use std::fs::File;
 
 use crate::code_runner::cmd;
 use crate::code_runner::language;
@@ -39,11 +39,10 @@ fn handle_error(error: Error) {
 
 fn start() -> Result<(), Error> {
     // can't start debug with stdin / temp disable
-    // let stdin = io::stdin();
-    let path = "sandbox.json";
-    
-    let file = File::open(path).unwrap();
-    let stdin = BufReader::new(file);
+    let stdin = io::stdin();
+    // let path = "sandbox.json";
+    // let file = File::open(path).unwrap();
+    // let stdin = BufReader::new(file);
    
     let stdout = io::stdout();
     let args = env::args().collect();
