@@ -385,7 +385,9 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
                     "npm run build".to_string(),
                 ],
                 // TODO create builded JSON from file system
-                run_command: "pwd".to_string()
+                //  tar -cz . | base64
+                run_command: "du -sh .[^.]*".to_string()
+                // run_command: "pwd".to_string()
             }
         }
 
