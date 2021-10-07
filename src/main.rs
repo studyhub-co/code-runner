@@ -105,7 +105,7 @@ struct RunResult {
 
 fn to_success_result(output: cmd::SuccessOutput) -> RunResult {
     RunResult{
-        stdout: output.stdout.replace('\n', ""), // fast fix for base64
+        stdout: output.stdout.replace('\n', ""), // fastfix for base64 - TODO not so good, need to create different approach of stdout for build procces (no need json write, etc see below)
         stderr: output.stderr,
         error: "".to_string(),
     }
