@@ -1,6 +1,8 @@
 mod code_runner;
 
 use std::io;
+// use std::io::Write;
+// use std::io::{self, Write};
 use std::fs;
 use std::fmt;
 use std::env;
@@ -44,6 +46,9 @@ fn start() -> Result<(), Error> {
     // let file = File::open(path).unwrap();
     // let stdin = BufReader::new(file);
    
+    // let stdout = io::stdout();
+    // stdout is frequently line-buffered by default so it may be necessary to use io::stdout().flush() 
+    // to ensure the output is emitted immediately.
     let stdout = io::stdout();
     let args = env::args().collect();
 
@@ -87,6 +92,7 @@ fn start() -> Result<(), Error> {
 
     serde_json::to_writer(stdout, &run_result)
         .map_err(Error::SerializeRunResult)
+    
 }
 
 
@@ -99,7 +105,7 @@ struct RunResult {
 
 fn to_success_result(output: cmd::SuccessOutput) -> RunResult {
     RunResult{
-        stdout: output.stdout,
+        stdout: output.stdout.replace('\n', ""), // fast fix for base64
         stderr: output.stderr,
         error: "".to_string(),
     }

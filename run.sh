@@ -13,3 +13,4 @@ JSON=$(cat <<-END
 END)
 
 echo $JSON | cargo run
+#echo $JSON | ./target/debug/code-runner
