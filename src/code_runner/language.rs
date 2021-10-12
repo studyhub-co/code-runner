@@ -379,13 +379,12 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
             RunInstructions{
                 // TODO need return if errors
                 build_commands: vec![
-                    "npm install".to_string(),
-                    "npm install --save create-react-app".to_string(),
-                    // "npm install --save create-react-app typescript @types/node @types/react @types/react-dom @types/jest".to_string(),
+                    "npm install --loglevel=error".to_string(),
+                    "npm install --loglevel=error --save create-react-app".to_string(),
                     "npm run build".to_string(),
                 ],
                 // TODO create builded JSON from file system
-                run_command: "tar -C -cz build | base64".to_string()
+                run_command: "tar -cz build | base64".to_string()
                 // run_command: "du -shc .[!.]* *".to_string()
                 // run_command: "pwd".to_string()
             }
