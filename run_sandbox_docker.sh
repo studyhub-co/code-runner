@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# cat sandbox.json | docker run glot/create-react-app
-docker run vermusl/create-react-app < sandbox.json
+# cat sandbox.json | docker run -i --tmpfs /tmp vermusl/create-react-app
+docker run -i --tmpfs /tmp vermusl/create-react-app < sandbox.json
