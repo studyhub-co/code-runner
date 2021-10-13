@@ -379,8 +379,11 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
             RunInstructions{
                 // return if stderr raise
                 build_commands: vec![
-                    "npm install --loglevel=error".to_string(),
-                    "npm install --loglevel=error --save create-react-app".to_string(),
+                    // "npm install --loglevel=error".to_string(),
+                    // "npm install --loglevel=error --save create-react-app".to_string(),
+                    // "npm run build".to_string(),
+                    "npm install".to_string(),
+                    "npm install create-react-app".to_string(),
                     "npm run build".to_string(),
                 ],
                 // create build archive
