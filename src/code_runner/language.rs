@@ -382,9 +382,10 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
                     // "npm install --loglevel=error".to_string(),
                     // "npm install --loglevel=error --save create-react-app".to_string(),
                     // "npm run build".to_string(),
-                    "npm install".to_string(),
-                    "npm install create-react-app".to_string(),
-                    "npm run build".to_string(),
+                    // suppress npm stderr due its output WARN messages as stderr
+                    "npm install 2>&1".to_string(),
+                    "npm install create-react-app 2>&1".to_string(),
+                    "npm run build 2>&1".to_string(),
                 ],
                 // create build archive
                 run_command: "tar -cz build | base64".to_string()
