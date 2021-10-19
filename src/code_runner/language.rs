@@ -384,7 +384,7 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
                     // "npm run build".to_string(),
                     // suppress npm stderr due its output WARN messages as stderr
                     "npm install 2>&1".to_string(),
-                    "npm install create-react-app 2>&1".to_string(),
+                    "npm install create-react-app react-scripts 2>&1".to_string(),
                     "npm install typescript @types/react @types/react-dom 2>&1".to_string(),
                     "npm run build".to_string(),
                 ],
