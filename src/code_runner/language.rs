@@ -379,13 +379,11 @@ pub fn run_instructions(language: &Language, files: non_empty_vec::NonEmptyVec<p
             RunInstructions{
                 // return if stderr raise
                 build_commands: vec![
-                    // "npm install --loglevel=error".to_string(),
-                    // "npm install --loglevel=error --save create-react-app".to_string(),
-                    // "npm run build".to_string(),
                     // suppress npm stderr due its output WARN messages as stderr
                     "npm install 2>&1".to_string(),
                     "npm install create-react-app react-scripts 2>&1".to_string(),
-                    "npm install typescript @types/react @types/react-dom 2>&1".to_string(),
+                    // it is better to use ts and type from sandbox package.json
+                    // "npm install typescript @types/react @types/react-dom 2>&1".to_string(),
                     "npm run build".to_string(),
                 ],
                 // create build archive
